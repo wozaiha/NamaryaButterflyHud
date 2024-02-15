@@ -1,6 +1,9 @@
 # NamaryaButterflyHud
 An self-made little hud for Namarya in Granblue Fantasy Relink
 
+Relink奶刀用蝴蝶HUD
+
+![preview](https://raw.githubusercontent.com/wozaiha/NamaryaButterflyHud/main/preview.png)
 
 ## How to run
 
