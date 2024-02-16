@@ -1722,6 +1722,7 @@ v_func = lambda a, off: size_t_from(size_t_from(a) + off)
 
 class HUD:
     _sys_key = '_hud_'
+    lasta1 = 0
 
     def __init__(self):
         self.server = get_server()
@@ -1730,16 +1731,36 @@ class HUD:
         p_updateNamarya = scanner.find_address('55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? C5 F9 7F BD ? ? ? ? C5 F9 7F B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 49 89 CC')
         self.updateNamarya_hook = Hook(p_updateNamarya, self._on_updateNamarya_evt,ctypes.c_void_p,[ctypes.c_size_t])
 
+        p_on_enter_area, = scanner.find_val('e8 * * * * c5 ? ? ? c5 f8 29 45 ? c7 45 ? ? ? ? ?')
+        self.on_enter_area_hook = Hook(p_on_enter_area, self._on_enter_area, ctypes.c_size_t, [
+            ctypes.c_uint,
+            ctypes.c_size_t,
+            ctypes.c_uint8
+        ])
 
     def _on_updateNamarya_evt(self, hook, a1):
         hook.original(a1)
         try:
             stance = i8_from(a1 + 0xD01C)
             num = i8_from(a1 + 0xD2F0)
+
+            if ((a1 != self.lasta1 and num != 0) or self.lasta1 == 0):
+                self.lasta1 = a1
+            if (self.lasta1 != a1):
+                return
             self.on_updateNamarya(stance, num)
         
         except:
             logging.error('on_updatingNamarya_evt', exc_info=True)
+
+
+    def _on_enter_area(self, hook, a1, a2, a3):
+        res = hook.original(a1, a2, a3)
+        try:
+            self.lasta1 = 0
+        except:
+            logging.error('on_enter_area', exc_info=True)
+        return res
 
 
     def on_updateNamarya(self, stance, num):
@@ -1749,12 +1770,14 @@ class HUD:
     def install(self):
         assert not hasattr(sys, self._sys_key), 'Act already installed'
         self.updateNamarya_hook.install_and_enable()
+        self.on_enter_area_hook.install_and_enable()
         setattr(sys, self._sys_key, self)
         return self
 
     def uninstall(self):
         assert getattr(sys, self._sys_key, None) is self, 'Act not installed'
         self.updateNamarya_hook.uninstall()
+        self.on_enter_area_hook.uninstall()
         delattr(sys, self._sys_key)
         return self
 

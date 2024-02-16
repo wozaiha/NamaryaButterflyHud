@@ -21,7 +21,7 @@ Relink奶刀用蝴蝶HUD
 
 3.PR is welcome
 
-4.Not fully tested,may cause issues when there are over 1 Namarya in party (multi-players etc)
+4.Not fully tested~~,may cause issues when there are over 1 Namarya in party (multi-players etc)~~
 
 ## 运行
 
@@ -39,7 +39,7 @@ Relink奶刀用蝴蝶HUD
 
 3.欢迎PR
 
-4.多奶刀游戏可能数据错误(未测试)
+4.~~多奶刀游戏可能数据错误(未测试)~~ 救了，希望能活
 
 
 ## Credit
