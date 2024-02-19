@@ -1175,8 +1175,8 @@ class Process:
                 self._cached_raw = super().get_raw()
             return self._cached_raw
 
-    class Injector:
-        logger = logging.getLogger('Injector')
+    class InjectorHUD:
+        logger = logging.getLogger('InjectorHUD')
 
         def __init__(self, process: 'Process'):
             self.process = process
@@ -1216,22 +1216,22 @@ class Process:
             shell_code = f'''
 def run_rpc_server_main():
     import threading
-    import injector
+    import hudinjector
     
-    res_id_counter = injector.Counter()
+    res_id_counter = hudinjector.Counter()
     pipe_name = {repr(self.pipe_name)}
     lock_file_name = {repr(str(self.lock_file.name))}
     def run_call(code, args, res_key='res', filename="<rpc>"):
         exec(compile(code, filename, 'exec'), namespace := {{'inject_server': server, 'args': args, '__file__': filename}})
         return namespace.get(res_key)
 
-    server = injector.RpcServer(pipe_name, {{"run": run_call}})
+    server = hudinjector.RpcServer(pipe_name, {{"run": run_call}})
     sys.stdout = type('_rpc_stdout', (), {{'write': lambda _, data: server.push_event('__std_out__', data), 'flush': lambda *_: None}})()
     sys.stderr = type('_rpc_stderr', (), {{'write': lambda _, data: server.push_event('__std_err__', data), 'flush': lambda *_: None}})()
     import logging
     for handler in logging.root.handlers[:]:
         handler.stream = sys.stdout
-    mutex = injector.Mutex(lock_file_name)
+    mutex = hudinjector.Mutex(lock_file_name)
     if not mutex.is_lock():
         setattr(sys, '__inject_server__', server)
         with mutex: server.serve()
@@ -1272,7 +1272,7 @@ except:
         def add_path(self, path):
             path = str(path)
             if self.is_active():
-                self.run(f'import sys;if {path!r} not in sys.path:sys.path.append({path!r})')
+                self.run(f'import sys;sys.path.append({path!r}) if {path!r} not in sys.path else None')
             else:
                 self.paths.append(path)
             return self
@@ -1611,8 +1611,8 @@ except:
             pass  # decref(p_dict)
 
     @functools.cached_property
-    def injector(self):
-        return self.Injector(self)
+    def hudinjector(self):
+        return self.InjectorHUD(self)
 
 
 Process.current = Process(kernel32.GetCurrentProcessId())
@@ -1891,14 +1891,18 @@ def main(exe_name):
     run_admin()
     enable_privilege()
     process = Process.from_name(exe_name)
-    process.injector.wait_inject()
-    process.injector.reg_std_out(lambda _, s: print(s, end=''))
-    process.injector.reg_std_err(lambda _, s: print(s, end=''))
-    process.injector.run("import importlib;import injector;importlib.reload(injector).injected_main()")
+    process.hudinjector.add_path(os.getcwd())
+    process.hudinjector.wait_inject()
+    process.hudinjector.reg_std_out(lambda _, s: print(s, end=''))
+    process.hudinjector.reg_std_err(lambda _, s: print(s, end=''))
+    process.hudinjector.run("import importlib;import hudinjector;importlib.reload(hudinjector).injected_main()")
     
 
 
 if __name__ == '__main__':
-    main('granblue_fantasy_relink.exe')
-    # while 1 :
-    #     time.sleep(1)
+    # try:
+        main('granblue_fantasy_relink.exe')
+    # except:
+    #     traceback.print_exc()
+    # finally:
+    #     os.system('pause')

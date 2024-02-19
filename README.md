@@ -11,7 +11,7 @@ Relink奶刀用蝴蝶HUD
 
 2.Clone this repo to local
 
-3.run `injector.py`
+3.run `hudinjector.py`
 
 ## Tips:
 
@@ -29,7 +29,7 @@ Relink奶刀用蝴蝶HUD
 
 2.克隆本repo
 
-3.运行`injector.py`
+3.运行`hudinjector.py`
 
 ## Tips:
 
