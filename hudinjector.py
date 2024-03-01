@@ -1790,9 +1790,9 @@ class HUD:
             stance = i8_from(a1 + 0xD01C)
             num = i8_from(a1 + 0xD2F0)
 
-            if ((a1 != self.lasta1 and num != 0) or self.lasta1 == 0):
+            if (a1 != self.lasta1 and num != 0) or self.lasta1 == 0:
                 self.lasta1 = a1
-            if (self.lasta1 != a1):
+            if self.lasta1 != a1:
                 return
             self.on_updateNamarya(stance, num)
 
@@ -1871,6 +1871,12 @@ class FlowerDraw:
     center = None
     radius = None
 
+    RED = 0
+    BLUE = 1
+    FULL = 0
+    NOTFULL = 1
+    colors = [['', ''], ['', '']]
+
     def init_FlowerDraw(self, center, radius):
         self.center = center
         self.radius = radius
@@ -1886,11 +1892,15 @@ class FlowerDraw:
             self.point_outline_y1[i] = center[1] + radius * math.sin(start_angle)
             self.point_outline_x2[i] = center[0] + radius * math.cos(end_angle)
             self.point_outline_y2[i] = center[1] + radius * math.sin(end_angle)
+        self.colors[self.RED][self.FULL] = '#FFCCFF'
+        self.colors[self.RED][self.NOTFULL] = '#CC00CC'
+        self.colors[self.BLUE][self.FULL] = '#CCFFFF'
+        self.colors[self.BLUE][self.NOTFULL] = '#00CCCC'
 
-    def draw_circle(self, canvas, color):
-        canvas.create_oval(self.center[0] - 10,self.center[1] - 10, self.center[0] + 10, self.center[1] + 10, fill=color)
+    def draw_circle(self, canvas, color_flag, full_flag):
+        canvas.create_oval(self.center[0] - 10,self.center[1] - 10, self.center[0] + 10, self.center[1] + 10, fill=self.colors[color_flag][full_flag])
 
-    def draw_flower(self, canvas, petal_num, color):
+    def draw_flower(self, canvas, petal_num, color_flag, full_flag):
         for i in range(petal_num):
             x1 = self.point_outline_x1[i]
             y1 = self.point_outline_y1[i]
@@ -1902,22 +1912,28 @@ class FlowerDraw:
             y1 = self.point_y1[i]
             x2 = self.point_x2[i]
             y2 = self.point_y2[i]
-            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill=color, outline=color)
+            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill=self.colors[color_flag][full_flag], outline=self.colors[color_flag][full_flag])
 
 
-def update_gui_from_queue(root, canvas, flower_draw):
+def update_gui_from_queue(root, canvas, flower_draw, last_data):
     try:
         # 非阻塞地从队列中获取数据
         data = data_queue.get_nowait()
-        # 使用队列中的数据更新GUI
-        num = data % 10
-        if data >= 10:
-            color = '#ff69b4'
-        else:
-            color = '#53CAFD'
-        canvas.delete("all")  # 清除画布上的所有内容
-        flower_draw.draw_circle(canvas, color)
-        flower_draw.draw_flower(canvas, num, color)
+        if last_data != data:
+            last_data = data
+            # 使用队列中的数据更新GUI
+            num = data % 10
+            if data >= 10:
+                color_flag = flower_draw.RED
+            else:
+                color_flag = flower_draw.BLUE
+            if num == 6:
+                full_flag = flower_draw.FULL
+            else:
+                full_flag = flower_draw.NOTFULL
+            canvas.delete("all")  # 清除画布上的所有内容
+            flower_draw.draw_flower(canvas, num, color_flag, full_flag)
+            flower_draw.draw_circle(canvas, color_flag, full_flag)
 
         # 清除队列中的数据标记为已处理
         data_queue.task_done()
@@ -1925,28 +1941,29 @@ def update_gui_from_queue(root, canvas, flower_draw):
         # 队列为空，没有新数据
         pass
     # 100毫秒后再次调用自身进行更新
-    root.after(100, update_gui_from_queue, root, canvas, flower_draw)
+    root.after(100, update_gui_from_queue, root, canvas, flower_draw, last_data)
 
 
 def draw_overlay():
     root = tk.Tk()
     root.title("Namarya Butterfly HUD")
 
+    screenwidth = root.winfo_screenwidth()
+    screenheight = root.winfo_screenheight()
+
     # 创建一个Canvas用于绘制花瓣
-    canvas = tk.Canvas(root, width=200, height=200, bg='black', highlightthickness=0)
+    canvas = tk.Canvas(root, width=0.185*screenheight, height=0.185*screenheight, bg='black', highlightthickness=0)
     canvas.pack()
 
     # 设置花瓣的中心点和半径
-    center = (100, 100)
-    radius = 50
+    center = (0.185*screenheight/2, 0.185*screenheight/2)
+    radius = 0.185*screenheight/4
     flower_draw = FlowerDraw()
     flower_draw.init_FlowerDraw(center, radius)
 
     # 设置窗口的默认位置
-    screenwidth = root.winfo_screenwidth()
-    screenheight = root.winfo_screenheight()
     x = int(screenwidth * 0.55)  # 设置窗口左上角的X坐标为屏幕宽度的55%
-    y = int(screenheight * 0.70)  # 设置窗口左上角的Y坐标为屏幕高度的70%
+    y = int(screenheight * 0.60)  # 设置窗口左上角的Y坐标为屏幕高度的60%
     root.geometry(f"+{x}+{y}")
 
     def on_drag(event):
@@ -1979,7 +1996,7 @@ def draw_overlay():
     root.wm_attributes("-transparentcolor", "black")
 
     # 启动周期性的GUI更新函数
-    root.after(100, update_gui_from_queue, root, canvas, flower_draw)
+    root.after(100, update_gui_from_queue, root, canvas, flower_draw, None)
 
     # 启动tkinter mainloop
     root.mainloop()
