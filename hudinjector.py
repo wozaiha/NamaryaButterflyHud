@@ -1857,7 +1857,7 @@ data_queue = queue.Queue()
 class FlowerDraw:
     angle = 2 * math.pi / 6
     sepa = angle / 3
-    outline_width = 3
+    outline_width = 1
     point_x1 = [0, 0, 0, 0, 0, 0]
     point_y1 = [0, 0, 0, 0, 0, 0]
     point_x2 = [0, 0, 0, 0, 0, 0]
@@ -1887,6 +1887,9 @@ class FlowerDraw:
             self.point_outline_x2[i] = center[0] + radius * math.cos(end_angle)
             self.point_outline_y2[i] = center[1] + radius * math.sin(end_angle)
 
+    def draw_circle(self, canvas, color):
+        canvas.create_oval(self.center[0] - 10,self.center[1] - 10, self.center[0] + 10, self.center[1] + 10, fill=color)
+
     def draw_flower(self, canvas, petal_num, color):
         for i in range(petal_num):
             x1 = self.point_outline_x1[i]
@@ -1913,6 +1916,7 @@ def update_gui_from_queue(root, canvas, flower_draw):
         else:
             color = '#53CAFD'
         canvas.delete("all")  # 清除画布上的所有内容
+        flower_draw.draw_circle(canvas, color)
         flower_draw.draw_flower(canvas, num, color)
 
         # 清除队列中的数据标记为已处理
@@ -1926,7 +1930,7 @@ def update_gui_from_queue(root, canvas, flower_draw):
 
 def draw_overlay():
     root = tk.Tk()
-    root.title("My Tkinter Window")
+    root.title("Namarya Butterfly HUD")
 
     # 创建一个Canvas用于绘制花瓣
     canvas = tk.Canvas(root, width=200, height=200, bg='black', highlightthickness=0)
@@ -2003,8 +2007,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
-    main('granblue_fantasy_relink.exe')
-# except:
-#     traceback.print_exc()
-# finally:
-#     os.system('pause')
+        main('granblue_fantasy_relink.exe')
+    # except:
+    #     traceback.print_exc()
+    # finally:
+    #     os.system('pause')
