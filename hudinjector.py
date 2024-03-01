@@ -5,6 +5,7 @@ import functools
 import io
 import locale
 import logging
+import math
 import os
 
 import msvcrt
@@ -29,7 +30,8 @@ _NULL = type('NULL', (), {})
 _T = typing.TypeVar('_T')
 
 
-def _win_api(func, res_type: typing.Any = ctypes.c_void_p, arg_types=(), error_zero=False, error_nonzero=False, error_val: typing.Any = _NULL):
+def _win_api(func, res_type: typing.Any = ctypes.c_void_p, arg_types=(), error_zero=False, error_nonzero=False,
+             error_val: typing.Any = _NULL):
     func.argtypes = arg_types
     func.restype = res_type
     if error_zero and error_nonzero:  # pragma: no cover
@@ -185,43 +187,78 @@ class OVERLAPPED(ctypes.Structure):
 class kernel32:
     dll = ctypes.WinDLL('kernel32.dll')
     GetCurrentProcess = _win_api(dll.GetCurrentProcess, ctypes.c_void_p, (), error_zero=True)
-    CreateToolhelp32Snapshot = _win_api(dll.CreateToolhelp32Snapshot, ctypes.c_void_p, (ctypes.c_ulong, ctypes.c_ulong), error_val=INVALID_HANDLE_VALUE)
+    CreateToolhelp32Snapshot = _win_api(dll.CreateToolhelp32Snapshot, ctypes.c_void_p, (ctypes.c_ulong, ctypes.c_ulong),
+                                        error_val=INVALID_HANDLE_VALUE)
     Process32First = _win_api(dll.Process32First, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
     Process32Next = _win_api(dll.Process32Next, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
     CloseHandle = _win_api(dll.CloseHandle, ctypes.c_bool, (ctypes.c_void_p,), error_zero=True)
-    OpenProcess = _win_api(dll.OpenProcess, ctypes.c_void_p, (ctypes.c_ulong, ctypes.c_bool, ctypes.c_ulong), error_zero=True)
-    CreateRemoteThread = _win_api(dll.CreateRemoteThread, ctypes.c_void_p, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_zero=True)
-    ReadProcessMemory = _win_api(dll.ReadProcessMemory, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p), error_zero=True)
-    WriteProcessMemory = _win_api(dll.WriteProcessMemory, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p), error_zero=True)
-    VirtualAllocEx = _win_api(dll.VirtualAllocEx, ctypes.c_void_p, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong), error_val=0)
-    VirtualFreeEx = _win_api(dll.VirtualFreeEx, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong), error_zero=True)
-    VirtualProtectEx = _win_api(dll.VirtualProtectEx, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_void_p), error_zero=True)
-    VirtualQueryEx = _win_api(dll.VirtualQueryEx, ctypes.c_size_t, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t), error_zero=True)
+    OpenProcess = _win_api(dll.OpenProcess, ctypes.c_void_p, (ctypes.c_ulong, ctypes.c_bool, ctypes.c_ulong),
+                           error_zero=True)
+    CreateRemoteThread = _win_api(dll.CreateRemoteThread, ctypes.c_void_p, (
+    ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong,
+    ctypes.c_void_p), error_zero=True)
+    ReadProcessMemory = _win_api(dll.ReadProcessMemory, ctypes.c_bool,
+                                 (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p),
+                                 error_zero=True)
+    WriteProcessMemory = _win_api(dll.WriteProcessMemory, ctypes.c_bool,
+                                  (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p),
+                                  error_zero=True)
+    VirtualAllocEx = _win_api(dll.VirtualAllocEx, ctypes.c_void_p,
+                              (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_ulong),
+                              error_val=0)
+    VirtualFreeEx = _win_api(dll.VirtualFreeEx, ctypes.c_bool,
+                             (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong), error_zero=True)
+    VirtualProtectEx = _win_api(dll.VirtualProtectEx, ctypes.c_bool,
+                                (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_ulong, ctypes.c_void_p),
+                                error_zero=True)
+    VirtualQueryEx = _win_api(dll.VirtualQueryEx, ctypes.c_size_t,
+                              (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t), error_zero=True)
     GetProcAddress = _win_api(dll.GetProcAddress, ctypes.c_void_p, (ctypes.c_void_p, ctypes.c_char_p), error_zero=True)
     GetModuleHandle = _win_api(dll.GetModuleHandleW, ctypes.c_size_t, (ctypes.c_wchar_p,), error_val=0)
     GetCurrentProcessId = _win_api(dll.GetCurrentProcessId, ctypes.c_ulong, (), error_zero=True)
-    WaitForSingleObject = _win_api(dll.WaitForSingleObject, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_ulong), error_val=0xFFFFFFFF)
-    CreateEvent = _win_api(dll.CreateEventW, ctypes.c_void_p, (ctypes.c_void_p, ctypes.c_bool, ctypes.c_bool, ctypes.c_wchar_p), error_val=INVALID_HANDLE_VALUE)
-    WriteFile = _win_api(dll.WriteFile, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_char_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
-    ReadFile = _win_api(dll.ReadFile, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
-    GetOverlappedResult = _win_api(dll.GetOverlappedResult, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_bool), error_zero=True)
-    CreateNamedPipe = _win_api(dll.CreateNamedPipeW, ctypes.c_void_p, (ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p), error_val=INVALID_HANDLE_VALUE)
-    ConnectNamedPipe = _win_api(dll.ConnectNamedPipe, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
-    CreateFile = _win_api(dll.CreateFileW, ctypes.c_void_p, (ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p), error_val=INVALID_HANDLE_VALUE)
-    SetNamedPipeHandleState = _win_api(dll.SetNamedPipeHandleState, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
+    WaitForSingleObject = _win_api(dll.WaitForSingleObject, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_ulong),
+                                   error_val=0xFFFFFFFF)
+    CreateEvent = _win_api(dll.CreateEventW, ctypes.c_void_p,
+                           (ctypes.c_void_p, ctypes.c_bool, ctypes.c_bool, ctypes.c_wchar_p),
+                           error_val=INVALID_HANDLE_VALUE)
+    WriteFile = _win_api(dll.WriteFile, ctypes.c_bool,
+                         (ctypes.c_void_p, ctypes.c_char_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p),
+                         error_zero=True)
+    ReadFile = _win_api(dll.ReadFile, ctypes.c_bool,
+                        (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p),
+                        error_zero=True)
+    GetOverlappedResult = _win_api(dll.GetOverlappedResult, ctypes.c_bool,
+                                   (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_bool), error_zero=True)
+    CreateNamedPipe = _win_api(dll.CreateNamedPipeW, ctypes.c_void_p, (
+    ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong,
+    ctypes.c_void_p), error_val=INVALID_HANDLE_VALUE)
+    ConnectNamedPipe = _win_api(dll.ConnectNamedPipe, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p),
+                                error_zero=True)
+    CreateFile = _win_api(dll.CreateFileW, ctypes.c_void_p, (
+    ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p),
+                          error_val=INVALID_HANDLE_VALUE)
+    SetNamedPipeHandleState = _win_api(dll.SetNamedPipeHandleState, ctypes.c_bool,
+                                       (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p),
+                                       error_zero=True)
 
 
 class advapi32:
     dll = ctypes.WinDLL('advapi32.dll')
-    OpenProcessToken = _win_api(dll.OpenProcessToken, ctypes.c_long, (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_zero=True)
-    LookupPrivilegeName = _win_api(dll.LookupPrivilegeNameW, ctypes.c_long, (ctypes.c_wchar_p, ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_void_p), error_zero=True)
-    LookupPrivilegeValue = _win_api(dll.LookupPrivilegeValueW, ctypes.c_long, (ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_void_p), error_zero=True)
-    AdjustTokenPrivileges = _win_api(dll.AdjustTokenPrivileges, ctypes.c_long, (ctypes.c_void_p, ctypes.c_long, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
+    OpenProcessToken = _win_api(dll.OpenProcessToken, ctypes.c_long, (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p),
+                                error_zero=True)
+    LookupPrivilegeName = _win_api(dll.LookupPrivilegeNameW, ctypes.c_long,
+                                   (ctypes.c_wchar_p, ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_void_p),
+                                   error_zero=True)
+    LookupPrivilegeValue = _win_api(dll.LookupPrivilegeValueW, ctypes.c_long,
+                                    (ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_void_p), error_zero=True)
+    AdjustTokenPrivileges = _win_api(dll.AdjustTokenPrivileges, ctypes.c_long, (
+    ctypes.c_void_p, ctypes.c_long, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
 
 
 class ntdll:
     dll = ctypes.WinDLL('ntdll.dll')
-    NtQueryInformationProcess = _win_api(dll.NtQueryInformationProcess, ctypes.c_long, (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_nonzero=True)
+    NtQueryInformationProcess = _win_api(dll.NtQueryInformationProcess, ctypes.c_long, (
+    ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_nonzero=True)
 
 
 def pid_by_executable(executable_name: bytes | str):
@@ -539,7 +576,8 @@ class Pattern:
         s.write('\n')
         for i, (sub, flag) in enumerate(zip(self.sub_matches, self.group_flags)):
             s.write(ind * _ind)
-            s.write(f'{i}:{"ref" if flag & _Pattern.fl_is_ref else "val"}{" store" if flag & _Pattern.fl_store else ""}\n')
+            s.write(
+                f'{i}:{"ref" if flag & _Pattern.fl_is_ref else "val"}{" store" if flag & _Pattern.fl_store else ""}\n')
             if sub is not None:
                 s.write(sub.fmt(ind, _ind + 1))
                 s.write('\n')
@@ -1163,7 +1201,8 @@ class Process:
         def search(self, pattern: str | Pattern) -> typing.Generator[tuple[int, list[int]], None, None]:
             if isinstance(pattern, str):  pattern = _Pattern.compile_pattern(pattern)
             for offset, args in pattern.finditer(self.get_raw()):
-                yield self.region_address + offset, [a + self.region_address if r else a for a, r in zip(args, pattern.res_is_ref)]
+                yield self.region_address + offset, [a + self.region_address if r else a for a, r in
+                                                     zip(args, pattern.res_is_ref)]
 
     class CachedRawMemoryPatternScanner(MemoryPatternScanner):
         def __init__(self, *a):
@@ -1302,7 +1341,8 @@ except:
         return kernel32.VirtualFreeEx(self.handle, address, size, 0x4000)  # MEM_DECOMMIT
 
     def virtual_query(self, address: int):
-        kernel32.VirtualQueryEx(self.handle, address, ctypes.byref(mbi := MEMORY_BASIC_INFORMATION()), ctypes.sizeof(mbi))
+        kernel32.VirtualQueryEx(self.handle, address, ctypes.byref(mbi := MEMORY_BASIC_INFORMATION()),
+                                ctypes.sizeof(mbi))
         return mbi
 
     def virtual_protect(self, address: int, size: int, protect: int):
@@ -1479,7 +1519,8 @@ except:
         if dll_name not in self._cached_scanners or force_new:
             for data in self.enum_ldr_data():
                 if data.BaseDllName.remote_value(self) == dll_name:
-                    self._cached_scanners[dll_name] = self.CachedRawMemoryPatternScanner(self, data.DllBase, data.SizeOfImage)
+                    self._cached_scanners[dll_name] = self.CachedRawMemoryPatternScanner(self, data.DllBase,
+                                                                                         data.SizeOfImage)
                     break
             else:
                 raise KeyError(f'dll {dll_name!r} not found')
@@ -1594,7 +1635,8 @@ except:
                     if exc_val:
                         py_str = self.call(py_base + self._get_pyfunc_offset("PyObject_Str"), exc_val)
                         str_size = ns.take(8)
-                        if p_str := self.call(py_base + self._get_pyfunc_offset("PyUnicode_AsUTF8AndSize"), py_str, str_size):
+                        if p_str := self.call(py_base + self._get_pyfunc_offset("PyUnicode_AsUTF8AndSize"), py_str,
+                                              str_size):
                             desc = self.read_string(p_str, self.read_u64(str_size))
                             # decref(py_str)
                         # decref(exc_val)
@@ -1633,13 +1675,16 @@ class Hook:
     dll = ctypes.cdll.LoadLibrary(ctypes.util.find_library(str(
         pathlib.Path(__file__).parent / 'EasyHook64.dll'
     )))
-    lh_install_hook = _win_api(dll.LhInstallHook, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
+    lh_install_hook = _win_api(dll.LhInstallHook, ctypes.c_ulong,
+                               (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
     lh_uninstall_hook = _win_api(dll.LhUninstallHook, ctypes.c_ulong, (ctypes.c_void_p,))
     lh_uninstall_all_hooks = _win_api(dll.LhUninstallAllHooks, ctypes.c_ulong)
     rtl_get_last_error = _win_api(dll.RtlGetLastError, ctypes.c_ulong)
     rtl_get_last_error_string = _win_api(dll.RtlGetLastErrorString, ctypes.c_wchar_p)
-    lh_set_inclusive_acl = _win_api(dll.LhSetInclusiveACL, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p))
-    lh_set_exclusive_acl = _win_api(dll.LhSetExclusiveACL, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p))
+    lh_set_inclusive_acl = _win_api(dll.LhSetInclusiveACL, ctypes.c_ulong,
+                                    (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p))
+    lh_set_exclusive_acl = _win_api(dll.LhSetExclusiveACL, ctypes.c_ulong,
+                                    (ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p))
     lh_get_bypass_address = _win_api(dll.LhGetHookBypassAddress, ctypes.c_ulong, (ctypes.c_void_p, ctypes.c_void_p))
     lh_wait_for_pending_removals = _win_api(dll.LhWaitForPendingRemovals, ctypes.c_ulong)
 
@@ -1728,8 +1773,9 @@ class HUD:
         self.server = get_server()
         scanner = Process.current.base_scanner()
 
-        p_updateNamarya = scanner.find_address('55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? C5 F9 7F BD ? ? ? ? C5 F9 7F B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 49 89 CC')
-        self.updateNamarya_hook = Hook(p_updateNamarya, self._on_updateNamarya_evt,ctypes.c_void_p,[ctypes.c_size_t])
+        p_updateNamarya = scanner.find_address(
+            '55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? C5 F9 7F BD ? ? ? ? C5 F9 7F B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 49 89 CC')
+        self.updateNamarya_hook = Hook(p_updateNamarya, self._on_updateNamarya_evt, ctypes.c_void_p, [ctypes.c_size_t])
 
         p_on_enter_area, = scanner.find_val('e8 * * * * c5 ? ? ? c5 f8 29 45 ? c7 45 ? ? ? ? ?')
         self.on_enter_area_hook = Hook(p_on_enter_area, self._on_enter_area, ctypes.c_size_t, [
@@ -1749,10 +1795,9 @@ class HUD:
             if (self.lasta1 != a1):
                 return
             self.on_updateNamarya(stance, num)
-        
+
         except:
             logging.error('on_updatingNamarya_evt', exc_info=True)
-
 
     def _on_enter_area(self, hook, a1, a2, a3):
         res = hook.original(a1, a2, a3)
@@ -1762,10 +1807,8 @@ class HUD:
             logging.error('on_enter_area', exc_info=True)
         return res
 
-
     def on_updateNamarya(self, stance, num):
         pass
-
 
     def install(self):
         assert not hasattr(sys, self._sys_key), 'Act already installed'
@@ -1797,48 +1840,114 @@ class HUD:
         cls.remove()
         return cls.get_or_create()
 
+
 class TestHUD(HUD):
     lock = threading.Lock()
-    
+
     def on_updateNamarya(self, stance, num):
         with self.lock:
             data = stance * 10 + num
             if data_queue.empty() or data_queue.queue[-1] != data:
                 data_queue.put(data)
 
+
 data_queue = queue.Queue()
 
-def update_gui_from_queue(root, label):
-    
+
+class FlowerDraw:
+    angle = 2 * math.pi / 6
+    sepa = angle / 3
+    outline_width = 1
+    point_x1 = [0, 0, 0, 0, 0, 0]
+    point_y1 = [0, 0, 0, 0, 0, 0]
+    point_x2 = [0, 0, 0, 0, 0, 0]
+    point_y2 = [0, 0, 0, 0, 0, 0]
+
+    point_outline_x1 = [0, 0, 0, 0, 0, 0]
+    point_outline_y1 = [0, 0, 0, 0, 0, 0]
+    point_outline_x2 = [0, 0, 0, 0, 0, 0]
+    point_outline_y2 = [0, 0, 0, 0, 0, 0]
+
+    center = None
+    radius = None
+
+    def init_FlowerDraw(self, center, radius):
+        self.center = center
+        self.radius = radius
+        for i in range(6):
+            start_angle = i * self.angle + self.sepa
+            end_angle = start_angle + self.angle - self.sepa
+            self.point_x1[i] = center[0] + (radius - self.outline_width) * math.cos(start_angle)
+            self.point_y1[i] = center[1] + (radius - self.outline_width) * math.sin(start_angle)
+            self.point_x2[i] = center[0] + (radius - self.outline_width) * math.cos(end_angle)
+            self.point_y2[i] = center[1] + (radius - self.outline_width) * math.sin(end_angle)
+
+            self.point_outline_x1[i] = center[0] + radius * math.cos(start_angle)
+            self.point_outline_y1[i] = center[1] + radius * math.sin(start_angle)
+            self.point_outline_x2[i] = center[0] + radius * math.cos(end_angle)
+            self.point_outline_y2[i] = center[1] + radius * math.sin(end_angle)
+
+    def draw_circle(self, canvas, color):
+        canvas.create_oval(self.center[0] - 10,self.center[1] - 10, self.center[0] + 10, self.center[1] + 10, fill=color)
+
+    def draw_flower(self, canvas, petal_num, color):
+        for i in range(petal_num):
+            x1 = self.point_outline_x1[i]
+            y1 = self.point_outline_y1[i]
+            x2 = self.point_outline_x2[i]
+            y2 = self.point_outline_y2[i]
+            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill="white", outline="white",
+                                  width=self.outline_width)
+            x1 = self.point_x1[i]
+            y1 = self.point_y1[i]
+            x2 = self.point_x2[i]
+            y2 = self.point_y2[i]
+            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill=color, outline=color)
+
+
+def update_gui_from_queue(root, canvas, flower_draw):
     try:
         # 非阻塞地从队列中获取数据
         data = data_queue.get_nowait()
         # 使用队列中的数据更新GUI
         num = data % 10
-        if (data >= 10):
-            label.config(text=f'{num}',fg = '#ff69b4')
+        if data >= 10:
+            color = '#ff69b4'
         else:
-            label.config(text=f'{num}',fg = 'blue')
-        
+            color = '#53CAFD'
+        canvas.delete("all")  # 清除画布上的所有内容
+        flower_draw.draw_circle(canvas, color)
+        flower_draw.draw_flower(canvas, num, color)
+
         # 清除队列中的数据标记为已处理
         data_queue.task_done()
     except queue.Empty:
         # 队列为空，没有新数据
         pass
     # 100毫秒后再次调用自身进行更新
-    root.after(100, update_gui_from_queue, root, label)
-
-
-
-
+    root.after(100, update_gui_from_queue, root, canvas, flower_draw)
 
 
 def draw_overlay():
     root = tk.Tk()
-    root.title("My Tkinter Window")
+    root.title("Namarya Butterfly HUD")
 
-    # 创建一个标签用于显示数据
-    label = tk.Label(root, text="Waiting for data...",font=("Microsoft YaHei", 24),bg = 'black')
+    # 创建一个Canvas用于绘制花瓣
+    canvas = tk.Canvas(root, width=200, height=200, bg='black', highlightthickness=0)
+    canvas.pack()
+
+    # 设置花瓣的中心点和半径
+    center = (100, 100)
+    radius = 50
+    flower_draw = FlowerDraw()
+    flower_draw.init_FlowerDraw(center, radius)
+
+    # 设置窗口的默认位置
+    screenwidth = root.winfo_screenwidth()
+    screenheight = root.winfo_screenheight()
+    x = int(screenwidth * 0.55)  # 设置窗口左上角的X坐标为屏幕宽度的55%
+    y = int(screenheight * 0.70)  # 设置窗口左上角的Y坐标为屏幕高度的70%
+    root.geometry(f"+{x}+{y}")
 
     def on_drag(event):
         # 计算鼠标移动的偏移量
@@ -1858,22 +1967,20 @@ def draw_overlay():
     root._drag_start_y = None
     root._start_x = None
     root._start_y = None
-    label.bind('<Button-1>', start_drag)  # 鼠标左键按下事件
-    label.bind('<B1-Motion>', on_drag)    # 鼠标拖动事件（左键按下的情况下移动）
+    canvas.bind('<Button-1>', start_drag)  # 鼠标左键按下事件
+    canvas.bind('<B1-Motion>', on_drag)  # 鼠标拖动事件（左键按下的情况下移动）
 
     root.overrideredirect(True)
-    screenwidth = root.winfo_screenwidth() // 2 + 300
-    screenheight = root.winfo_screenheight() // 4 * 3 
-    root.geometry(f"+{screenwidth}+{screenheight}")
+    # screenwidth = root.winfo_screenwidth() // 2 + 300
+    # screenheight = root.winfo_screenheight() // 4 * 3
+    # root.geometry(f"+{screenwidth}+{screenheight}")
     root.lift()
     root.wm_attributes("-topmost", True)
     root.wm_attributes("-transparentcolor", "black")
 
-    label.pack()
-    
     # 启动周期性的GUI更新函数
-    root.after(100, update_gui_from_queue, root, label)
-    
+    root.after(100, update_gui_from_queue, root, canvas, flower_draw)
+
     # 启动tkinter mainloop
     root.mainloop()
 
@@ -1896,7 +2003,6 @@ def main(exe_name):
     process.hudinjector.reg_std_out(lambda _, s: print(s, end=''))
     process.hudinjector.reg_std_err(lambda _, s: print(s, end=''))
     process.hudinjector.run("import importlib;import hudinjector;importlib.reload(hudinjector).injected_main()")
-    
 
 
 if __name__ == '__main__':

@@ -11,17 +11,17 @@ Relink奶刀用蝴蝶HUD
 
 2.Clone this repo to local
 
-3.run `hudinjector.py`
+3.***Run the game first***, then run `hudinjector.py`
 
 ## Tips:
 
 1.LMB drag to move
 
-2.Alt+Tab to close
+2.Alt+Tab & choose the hud to close
 
 3.PR is welcome
 
-4.Not fully tested~~,may cause issues when there are over 1 Namarya in party (multi-players etc)~~
+4.Not fully tested ~~,may cause issues when there are over 1 Namarya in party (multi-players etc)~~
 
 ## 运行
 
@@ -29,13 +29,13 @@ Relink奶刀用蝴蝶HUD
 
 2.克隆本repo
 
-3.运行`hudinjector.py`
+3.***保证游戏已经在运行***,运行`hudinjector.py`
 
 ## Tips:
 
 1.鼠标左键拖动
 
-2.Alt+Tab以关闭悬浮窗
+2.Alt+Tab选择对应的hud关闭以关闭悬浮窗
 
 3.欢迎PR
 
@@ -45,5 +45,5 @@ Relink奶刀用蝴蝶HUD
 ## Credit
 
 [nyao_OuO](https://github.com/nyaoouo) for origin code and programing help
-
+[Wrderly](https://github.com/Wrderly) for the GUI
 
