@@ -195,8 +195,8 @@ class kernel32:
     OpenProcess = _win_api(dll.OpenProcess, ctypes.c_void_p, (ctypes.c_ulong, ctypes.c_bool, ctypes.c_ulong),
                            error_zero=True)
     CreateRemoteThread = _win_api(dll.CreateRemoteThread, ctypes.c_void_p, (
-    ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong,
-    ctypes.c_void_p), error_zero=True)
+        ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_ulong,
+        ctypes.c_void_p), error_zero=True)
     ReadProcessMemory = _win_api(dll.ReadProcessMemory, ctypes.c_bool,
                                  (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_void_p),
                                  error_zero=True)
@@ -230,12 +230,14 @@ class kernel32:
     GetOverlappedResult = _win_api(dll.GetOverlappedResult, ctypes.c_bool,
                                    (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_bool), error_zero=True)
     CreateNamedPipe = _win_api(dll.CreateNamedPipeW, ctypes.c_void_p, (
-    ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong,
-    ctypes.c_void_p), error_val=INVALID_HANDLE_VALUE)
+        ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong,
+        ctypes.c_ulong,
+        ctypes.c_void_p), error_val=INVALID_HANDLE_VALUE)
     ConnectNamedPipe = _win_api(dll.ConnectNamedPipe, ctypes.c_bool, (ctypes.c_void_p, ctypes.c_void_p),
                                 error_zero=True)
     CreateFile = _win_api(dll.CreateFileW, ctypes.c_void_p, (
-    ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p),
+        ctypes.c_wchar_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong,
+        ctypes.c_void_p),
                           error_val=INVALID_HANDLE_VALUE)
     SetNamedPipeHandleState = _win_api(dll.SetNamedPipeHandleState, ctypes.c_bool,
                                        (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p),
@@ -252,13 +254,14 @@ class advapi32:
     LookupPrivilegeValue = _win_api(dll.LookupPrivilegeValueW, ctypes.c_long,
                                     (ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_void_p), error_zero=True)
     AdjustTokenPrivileges = _win_api(dll.AdjustTokenPrivileges, ctypes.c_long, (
-    ctypes.c_void_p, ctypes.c_long, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p), error_zero=True)
+        ctypes.c_void_p, ctypes.c_long, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_void_p),
+                                     error_zero=True)
 
 
 class ntdll:
     dll = ctypes.WinDLL('ntdll.dll')
     NtQueryInformationProcess = _win_api(dll.NtQueryInformationProcess, ctypes.c_long, (
-    ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_nonzero=True)
+        ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p, ctypes.c_ulong, ctypes.c_void_p), error_nonzero=True)
 
 
 def pid_by_executable(executable_name: bytes | str):
@@ -1892,13 +1895,14 @@ class FlowerDraw:
             self.point_outline_y1[i] = center[1] + radius * math.sin(start_angle)
             self.point_outline_x2[i] = center[0] + radius * math.cos(end_angle)
             self.point_outline_y2[i] = center[1] + radius * math.sin(end_angle)
-        self.colors[self.RED][self.FULL] = '#FFCCFF'
+        self.colors[self.RED][self.FULL] = '#DDAADD'
         self.colors[self.RED][self.NOTFULL] = '#CC00CC'
-        self.colors[self.BLUE][self.FULL] = '#CCFFFF'
-        self.colors[self.BLUE][self.NOTFULL] = '#00CCCC'
+        self.colors[self.BLUE][self.FULL] = '#AADDDD'
+        self.colors[self.BLUE][self.NOTFULL] = '#00BBBB'
 
     def draw_circle(self, canvas, color_flag, full_flag):
-        canvas.create_oval(self.center[0] - 10,self.center[1] - 10, self.center[0] + 10, self.center[1] + 10, fill=self.colors[color_flag][full_flag])
+        canvas.create_oval(self.center[0] - 10, self.center[1] - 10, self.center[0] + 10, self.center[1] + 10,
+                           fill=self.colors[color_flag][full_flag])
 
     def draw_flower(self, canvas, petal_num, color_flag, full_flag):
         for i in range(petal_num):
@@ -1906,32 +1910,29 @@ class FlowerDraw:
             y1 = self.point_outline_y1[i]
             x2 = self.point_outline_x2[i]
             y2 = self.point_outline_y2[i]
-            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill="white", outline="white",
+            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill="#E0E0E0", outline="#E0E0E0",
                                   width=self.outline_width)
             x1 = self.point_x1[i]
             y1 = self.point_y1[i]
             x2 = self.point_x2[i]
             y2 = self.point_y2[i]
-            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2, fill=self.colors[color_flag][full_flag], outline=self.colors[color_flag][full_flag])
+            canvas.create_polygon(self.center[0], self.center[1], x1, y1, x2, y2,
+                                  fill=self.colors[color_flag][full_flag], outline="#E0E0E0", width=0.5)
 
 
 def update_gui_from_queue(root, canvas, flower_draw, last_data):
     try:
         # 非阻塞地从队列中获取数据
         data = data_queue.get_nowait()
+
         if last_data != data:
             last_data = data
             # 使用队列中的数据更新GUI
             num = data % 10
-            if data >= 10:
-                color_flag = flower_draw.RED
-            else:
-                color_flag = flower_draw.BLUE
-            if num == 6:
-                full_flag = flower_draw.FULL
-            else:
-                full_flag = flower_draw.NOTFULL
-            canvas.delete("all")  # 清除画布上的所有内容
+            color_flag = flower_draw.RED if data >= 10 else flower_draw.BLUE
+            full_flag = flower_draw.FULL if num == 6 else flower_draw.NOTFULL
+
+            canvas.delete("all")
             flower_draw.draw_flower(canvas, num, color_flag, full_flag)
             flower_draw.draw_circle(canvas, color_flag, full_flag)
 
@@ -1952,12 +1953,12 @@ def draw_overlay():
     screenheight = root.winfo_screenheight()
 
     # 创建一个Canvas用于绘制花瓣
-    canvas = tk.Canvas(root, width=0.185*screenheight, height=0.185*screenheight, bg='black', highlightthickness=0)
+    canvas = tk.Canvas(root, width=0.185 * screenheight, height=0.185 * screenheight, bg='black', highlightthickness=0)
     canvas.pack()
 
     # 设置花瓣的中心点和半径
-    center = (0.185*screenheight/2, 0.185*screenheight/2)
-    radius = 0.185*screenheight/4
+    center = (0.185 * screenheight / 2, 0.185 * screenheight / 2)
+    radius = 0.185 * screenheight / 4
     flower_draw = FlowerDraw()
     flower_draw.init_FlowerDraw(center, radius)
 
@@ -2024,8 +2025,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
-        main('granblue_fantasy_relink.exe')
-    # except:
-    #     traceback.print_exc()
-    # finally:
-    #     os.system('pause')
+    main('granblue_fantasy_relink.exe')
+# except:
+#     traceback.print_exc()
+# finally:
+#     os.system('pause')
