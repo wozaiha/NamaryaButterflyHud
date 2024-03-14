@@ -1781,10 +1781,11 @@ class HUD:
         self.updateNamarya_hook = Hook(p_updateNamarya, self._on_updateNamarya_evt, ctypes.c_void_p, [ctypes.c_size_t])
 
         p_on_enter_area, = scanner.find_val('e8 * * * * c5 ? ? ? c5 f8 29 45 ? c7 45 ? ? ? ? ?')
-        self.on_enter_area_hook = Hook(p_on_enter_area, self._on_enter_area, ctypes.c_size_t, [
+        self.on_enter_area_hook = Hook(p_on_enter_area, self._on_enter_area, ctypes.c_uint64, [
             ctypes.c_uint,
-            ctypes.c_size_t,
-            ctypes.c_uint8
+            ctypes.c_uint64,
+            ctypes.c_uint64,
+            ctypes.c_uint64,
         ])
 
     def _on_updateNamarya_evt(self, hook, a1):
@@ -1802,8 +1803,8 @@ class HUD:
         except:
             logging.error('on_updatingNamarya_evt', exc_info=True)
 
-    def _on_enter_area(self, hook, a1, a2, a3):
-        res = hook.original(a1, a2, a3)
+    def _on_enter_area(self, hook, *a):
+        res = hook.original(*a)
         try:
             self.lasta1 = 0
         except:
