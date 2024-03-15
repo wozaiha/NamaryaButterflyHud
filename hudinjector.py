@@ -1791,8 +1791,8 @@ class HUD:
     def _on_updateNamarya_evt(self, hook, a1):
         hook.original(a1)
         try:
-            stance = i8_from(a1 + 0xD01C)
-            num = i8_from(a1 + 0xD2F0)
+            stance = i8_from(a1 + 0xD12C)
+            num = i8_from(a1 + 0xD400)
 
             if (a1 != self.lasta1 and num != 0) or self.lasta1 == 0:
                 self.lasta1 = a1
@@ -2026,8 +2026,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
-    main('granblue_fantasy_relink.exe')
-# except:
-#     traceback.print_exc()
-# finally:
-#     os.system('pause')
+        main('granblue_fantasy_relink.exe')
+    # except:
+    #     traceback.print_exc()
+    # finally:
+    #     os.system('pause')
