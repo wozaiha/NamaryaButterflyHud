@@ -49,7 +49,7 @@ class ButterflyDraw:
         self.radius = radius
         for i in range(6):
             start_angle = i * self.angle + self.xw
-            end_angle = start_angle + self.angle
+            end_angle = start_angle - self.angle
 
             the_angle = start_angle if i % 2 else end_angle
 
