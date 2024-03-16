@@ -1882,9 +1882,10 @@ def main(exe_name):
 
 
 if __name__ == '__main__':
-    # try:
     main('granblue_fantasy_relink.exe')
-# except:
-#     traceback.print_exc()
-# finally:
-#     os.system('pause')
+    # try:
+    #     main('granblue_fantasy_relink.exe')
+    # except:
+    #     traceback.print_exc()
+    # finally:
+    #     os.system('pause')
