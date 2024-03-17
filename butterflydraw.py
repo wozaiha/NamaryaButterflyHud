@@ -100,7 +100,7 @@ def draw_overlay():
 
     # 设置花瓣的中心点和半径
     center = (size_base * screenheight / 2, size_base * screenheight / 2)
-    radius = size_base * screenheight / 6
+    radius = size_base * screenheight / 7
     butterfly_draw = ButterflyDraw()
     butterfly_draw.init_FlowerDraw(center, radius)
 
