@@ -5,7 +5,7 @@ import functools
 import io
 import locale
 import logging
-import math
+import json
 import os
 
 import msvcrt
@@ -18,14 +18,10 @@ import traceback
 import types
 
 import time
-import json
+
 
 import sys
 import typing
-
-import tkinter as tk
-from tkinter import font
-import queue
 
 _NULL = type('NULL', (), {})
 _T = typing.TypeVar('_T')
@@ -1858,23 +1854,24 @@ class TestHUD(HUD):
 
 from dataqueue import data_queue
 
-f = open('config.json', 'r')
+
+f = open(os.path.split(os.path.realpath(__file__))[0] + '\\config.json', 'r')
 res = json.loads(f.read())
 f.close()
 
 ui_type = res["type"]
 if ui_type == 1:
-    from flowerdraw import draw_overlay as draw_overlay
+    from butterflyimg import draw_overlay as the_draw_overlay
 elif ui_type == 2:
-    from butterflydraw import draw_overlay as draw_overlay
+    from butterflydraw import draw_overlay as the_draw_overlay
 else:
-    from butterflyimg import draw_overlay as draw_overlay
+    from flowerdraw import draw_overlay as the_draw_overlay
 
 
 def injected_main():
     print(f'i am in pid={os.getpid()}')
     TestHUD.reload()
-    t = threading.Thread(target=draw_overlay, daemon=True)
+    t = threading.Thread(target=the_draw_overlay, daemon=True)
     t.start()
 
     print('HUD loaded')
@@ -1893,6 +1890,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
+    from packagecheck import package_check
+    package_check()
     main('granblue_fantasy_relink.exe')
 # except:
 #     traceback.print_exc()

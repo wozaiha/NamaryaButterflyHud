@@ -103,7 +103,7 @@ def draw_overlay():
     screenwidth = root.winfo_screenwidth()
     screenheight = root.winfo_screenheight()
 
-    f = open('config.json', 'r')
+    f = open(os.path.split(os.path.realpath(__file__))[0] + '\\config.json', 'r')
     res = json.loads(f.read())
     f.close()
 
