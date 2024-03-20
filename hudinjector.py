@@ -18,6 +18,7 @@ import traceback
 import types
 
 import time
+import json
 
 import sys
 import typing
@@ -1857,14 +1858,23 @@ class TestHUD(HUD):
 
 from dataqueue import data_queue
 
-# from flowerdraw import draw_overlay as flowerdraw_overlay
-from butterflydraw import draw_overlay as butterflydraw_overlay
+f = open('config.json', 'r')
+res = json.loads(f.read())
+f.close()
+
+ui_type = res["type"]
+if ui_type == 1:
+    from flowerdraw import draw_overlay as draw_overlay
+elif ui_type == 2:
+    from butterflydraw import draw_overlay as draw_overlay
+else:
+    from butterflyimg import draw_overlay as draw_overlay
 
 
 def injected_main():
     print(f'i am in pid={os.getpid()}')
     TestHUD.reload()
-    t = threading.Thread(target=butterflydraw_overlay, daemon=True)
+    t = threading.Thread(target=draw_overlay, daemon=True)
     t.start()
 
     print('HUD loaded')

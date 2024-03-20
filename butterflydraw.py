@@ -1,3 +1,4 @@
+import json
 import math
 import queue
 import threading
@@ -177,7 +178,14 @@ def draw_overlay():
     screenwidth = root.winfo_screenwidth()
     screenheight = root.winfo_screenheight()
 
-    size_base = 0.2775
+    f = open('config.json', 'r')
+    res = json.loads(f.read())
+    f.close()
+
+    size_rate = res["size"]
+    radius_rate = res["radius"]
+
+    size_base = 0.2775 * size_rate
     canvas_size = size_base * screenheight
     # size_base = 0.5
 
@@ -190,7 +198,7 @@ def draw_overlay():
 
     # 设置花瓣的中心点和半径
     center = (canvas_size / 2, canvas_size / 2)
-    radius = canvas_size / 4
+    radius = canvas_size / 4 * radius_rate
     butterfly_draw = ButterflyDraw()
     butterfly_draw.init_FlowerDraw(center, radius)
 
