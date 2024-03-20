@@ -2,7 +2,9 @@
 
 An self-made little hud for Narmaya in Granblue Fantasy Relink
 
-Relink 奶刀用蝴蝶 HUD
+碧蓝幻想:Relink 娜露梅蝴蝶HUD
+
+
 
 ver1
 
