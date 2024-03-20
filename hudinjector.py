@@ -1892,8 +1892,11 @@ if __name__ == '__main__':
     # try:
     from packagecheck import package_check
     package_check()
+
     main('granblue_fantasy_relink.exe')
-# except:
-#     traceback.print_exc()
-# finally:
-#     os.system('pause')
+    # try:
+    #     main('granblue_fantasy_relink.exe')
+    # except:
+    #     traceback.print_exc()
+    # finally:
+    #     os.system('pause')
