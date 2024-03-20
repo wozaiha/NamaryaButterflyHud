@@ -30,15 +30,15 @@ ver2
 
 3.PR is welcome
 
-4.Not fully tested ~~,may cause issues when there are over 1 Namarya in party (multi-players etc)~~
+4.May crash after game updates
 
 ## Config
 
 1.open `config.json`
 
-2.modify the corresponding value of 'type' to 1/2/3 to enable different ui
+2.modify the value of 'type' to 1/2/3 to enable different ui
 
-3.modify the corresponding value of 'size'/'radius' to change ui size
+3.modify the value of 'size' & 'radius' to change ui size ratio
 
 ## 运行
 
@@ -64,7 +64,7 @@ ver2
 
 2.修改'type'对应数值为 1/2/3 以启用不同 ui
 
-3.修改'size'/'radius'对应数值以更改 ui 尺寸
+3.修改'size'及'radius'数值以更改 ui 尺寸比例
 
 ## Credit
 
