@@ -178,18 +178,19 @@ def draw_overlay():
     screenheight = root.winfo_screenheight()
 
     size_base = 0.2775
+    canvas_size = size_base * screenheight
     # size_base = 0.5
 
     # 创建一个Canvas用于绘制花瓣
-    canvas = tk.Canvas(root, width=size_base * screenheight, height=size_base * screenheight, bg='black',
+    canvas = tk.Canvas(root, width=canvas_size, height=canvas_size, bg='black',
                        highlightthickness=0)
     canvas.pack()
 
 
 
     # 设置花瓣的中心点和半径
-    center = (size_base * screenheight / 2, size_base * screenheight / 2)
-    radius = size_base * screenheight / 4
+    center = (canvas_size / 2, canvas_size / 2)
+    radius = canvas_size / 4
     butterfly_draw = ButterflyDraw()
     butterfly_draw.init_FlowerDraw(center, radius)
 
