@@ -2,7 +2,7 @@
 
 An self-made little hud for Narmaya in Granblue Fantasy Relink
 
-碧蓝幻想:Relink 娜露梅蝴蝶HUD
+碧蓝幻想:Relink 娜露梅蝴蝶 HUD
 
 ver1
 
@@ -66,9 +66,10 @@ ver2
 
 3.修改'size'及'radius'数值以更改 ui 尺寸比例
 
-4.修改'x'/'y'对应数值(0-1)以修改启动时ui相对于屏幕的初始位置(从左上角开始计算)
+4.修改'x'/'y'对应数值(0-1)以修改启动时 ui 相对于屏幕的初始位置(从左上角开始计算)
 
 ## Credit
 
 [nyao_OuO](https://github.com/nyaoouo) for origin code and programing help
+
 [Wrderly](https://github.com/Wrderly) for the GUI
