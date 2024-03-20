@@ -1,4 +1,6 @@
+import json
 import math
+import os
 import queue
 
 from dataqueue import data_queue
@@ -101,13 +103,23 @@ def draw_overlay():
     screenwidth = root.winfo_screenwidth()
     screenheight = root.winfo_screenheight()
 
+    f = open(os.path.split(os.path.realpath(__file__))[0] + '\\config.json', 'r')
+    res = json.loads(f.read())
+    f.close()
+
+    size_rate = res["size"]
+    radius_rate = res["radius"]
+
+    size_base = 0.2775 * size_rate
+    canvas_size = size_base * screenheight
+
     # 创建一个Canvas用于绘制花瓣
-    canvas = tk.Canvas(root, width=0.185 * screenheight, height=0.185 * screenheight, bg='black', highlightthickness=0)
+    canvas = tk.Canvas(root, width=canvas_size, height=canvas_size, bg='black', highlightthickness=0)
     canvas.pack()
 
     # 设置花瓣的中心点和半径
-    center = (0.185 * screenheight / 2, 0.185 * screenheight / 2)
-    radius = 0.185 * screenheight / 4
+    center = (canvas_size / 2, canvas_size / 2)
+    radius = canvas_size / 4 * radius_rate
     flower_draw = FlowerDraw()
     flower_draw.init_FlowerDraw(center, radius)
 
