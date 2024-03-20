@@ -4,8 +4,6 @@ An self-made little hud for Narmaya in Granblue Fantasy Relink
 
 碧蓝幻想:Relink 娜露梅蝴蝶HUD
 
-
-
 ver1
 
 <img title="" src="./img/previewimg1.png" alt="preview" width="350" data-align="inline">
@@ -40,6 +38,8 @@ ver2
 
 3.modify the corresponding value of 'size'/'radius' to change ui size
 
+4.Modify the value (0-1) corresponding to' x'/'y' to modify the initial position of the ui relative to the screen at startup (calculated from the upper left corner)
+
 ## 运行
 
 1.安装 python-3.11.6 https://www.python.org/ftp/python/3.11.6/python-3.11.6-amd64.exe
@@ -65,6 +65,8 @@ ver2
 2.修改'type'对应数值为 1/2/3 以启用不同 ui
 
 3.修改'size'/'radius'对应数值以更改 ui 尺寸
+
+4.修改'x'/'y'对应数值(0-1)以修改启动时ui相对于屏幕的初始位置(从左上角开始计算)
 
 ## Credit
 

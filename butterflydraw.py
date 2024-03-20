@@ -17,6 +17,8 @@ NOTFULL = 1
 X = 0
 Y = 1
 
+DEBUG = False
+
 
 class ButterflyDraw:
     angle = 2 * math.pi / 6
@@ -149,8 +151,10 @@ class ButterflyDraw:
 def update_gui_from_queue(root, canvas, butterfly_draw: ButterflyDraw, last_data):
     try:
         # 非阻塞地从队列中获取数据
-        data = data_queue.get_nowait()
-        # data = 6
+        if not DEBUG:
+            data = data_queue.get_nowait()
+        else:
+            data = (last_data + 1) % 7 if last_data is not None else 0
 
         if last_data != data:
             last_data = data
@@ -164,7 +168,8 @@ def update_gui_from_queue(root, canvas, butterfly_draw: ButterflyDraw, last_data
             butterfly_draw.draw_circle(canvas, color_flag, full_flag)
 
         # 清除队列中的数据标记为已处理
-        data_queue.task_done()
+        if not DEBUG:
+            data_queue.task_done()
     except queue.Empty:
         # 队列为空，没有新数据
         pass
@@ -185,6 +190,8 @@ def draw_overlay():
 
     size_rate = res["size"]
     radius_rate = res["radius"]
+    x_rate = res["x"]
+    y_rate = res["y"]
 
     size_base = 0.2775 * size_rate
     canvas_size = size_base * screenheight
@@ -195,8 +202,6 @@ def draw_overlay():
                        highlightthickness=0)
     canvas.pack()
 
-
-
     # 设置花瓣的中心点和半径
     center = (canvas_size / 2, canvas_size / 2)
     radius = canvas_size / 4 * radius_rate
@@ -204,8 +209,8 @@ def draw_overlay():
     butterfly_draw.init_FlowerDraw(center, radius)
 
     # 设置窗口的默认位置
-    x = int(screenwidth * 0.55)  # 设置窗口左上角的X坐标为屏幕宽度的55%
-    y = int(screenheight * 0.60)  # 设置窗口左上角的Y坐标为屏幕高度的60%
+    x = int(screenwidth * x_rate)  # 设置窗口左上角的X坐标为屏幕宽度的55%
+    y = int(screenheight * y_rate)  # 设置窗口左上角的Y坐标为屏幕高度的60%
     root.geometry(f"+{x}+{y}")
 
     def on_drag(event):
@@ -244,4 +249,5 @@ def draw_overlay():
     root.mainloop()
 
 
-# draw_overlay()
+if DEBUG:
+    draw_overlay()
