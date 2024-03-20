@@ -10,7 +10,7 @@ ver1
 
 ver2
 
-<img title="" src="./img/preview1.png" alt="previewimg1.png" width="350" data-align="inline">
+<img title="" src="./img/previewdraw1.png" alt="previewimg1.png" width="350" data-align="inline">
 
 ## How to run
 
