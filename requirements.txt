@@ -1,1 +1,2 @@
 PILLOW
+PyQt5
