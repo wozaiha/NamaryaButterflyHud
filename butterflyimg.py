@@ -15,6 +15,8 @@ NOTFULL = 1
 X = 0
 Y = 1
 
+DEBUG = False
+
 
 class ButterflyImg:
     angle = math.pi / 3
@@ -27,15 +29,25 @@ class ButterflyImg:
     colors = [['', ''], ['', '']]
 
     def __init__(self):
+        self.radius_rate = None
+        self.size_rate = None
         self.purple = []
         self.blue = []
 
-    def init_ButterflyImg(self, center, radius):
+    def init_ButterflyImg(self, center, radius, size_rate):
         self.center = center
         self.radius = radius
+        self.size_rate = size_rate
 
         blueimage = Image.open(os.path.split(os.path.realpath(__file__))[0] + "\\img\\blue.png")
         purpleimage = Image.open(os.path.split(os.path.realpath(__file__))[0] + "\\img\\purple.png")
+
+        print("start resize")
+        resized_blueimage = blueimage.resize(
+            (int(blueimage.size[0] * self.size_rate), int(blueimage.size[1] * self.size_rate)))
+        resized_purpleimage = purpleimage.resize(
+            (int(purpleimage.size[0] * self.size_rate), int(purpleimage.size[1] * self.size_rate)))
+        print("end resize")
 
         for i in range(6):
             the_angle = i * self.angle
@@ -43,8 +55,8 @@ class ButterflyImg:
             self.point1[i][Y] = center[Y] + radius * math.sin(the_angle + self.xw_angle)
 
             # 旋转图片
-            rotated_blueimage = blueimage.rotate(-i * 60 + 20)
-            rotated_purpleimage = purpleimage.rotate(-i * 60 + 20)
+            rotated_blueimage = resized_blueimage.rotate(-i * 60 + 20)
+            rotated_purpleimage = resized_purpleimage.rotate(-i * 60 + 20)
 
             # 将旋转后的PIL的Image对象转换为Tkinter的PhotoImage对象
             blueimg = ImageTk.PhotoImage(rotated_blueimage)
@@ -73,8 +85,10 @@ class ButterflyImg:
 def update_gui_from_queue(root, canvas, butterfly_draw: ButterflyImg, last_data):
     try:
         # 非阻塞地从队列中获取数据
-        data = data_queue.get_nowait()
-        # data = (last_data + 1) % 7 if last_data is not None else 0
+        if not DEBUG:
+            data = data_queue.get_nowait()
+        else:
+            data = (last_data + 1) % 7 if last_data is not None else 0
 
         if last_data != data:
             last_data = data
@@ -88,7 +102,8 @@ def update_gui_from_queue(root, canvas, butterfly_draw: ButterflyImg, last_data)
             butterfly_draw.draw_circle(canvas, color_flag, full_flag)
 
         # 清除队列中的数据标记为已处理
-        data_queue.task_done()
+        if not DEBUG:
+            data_queue.task_done()
     except queue.Empty:
         # 队列为空，没有新数据
         pass
@@ -109,6 +124,8 @@ def draw_overlay():
 
     size_rate = res["size"]
     radius_rate = res["radius"]
+    x_rate = res["x"]
+    y_rate = res["y"]
 
     size_base = 0.2775 * size_rate
     canvas_size = size_base * screenheight
@@ -123,11 +140,11 @@ def draw_overlay():
     center = (canvas_size / 2, canvas_size / 2)
     radius = canvas_size / 7 * radius_rate
     butterfly_draw = ButterflyImg()
-    butterfly_draw.init_ButterflyImg(center, radius)
+    butterfly_draw.init_ButterflyImg(center, radius, size_rate)
 
     # 设置窗口的默认位置
-    x = int(screenwidth * 0.55)  # 设置窗口左上角的X坐标为屏幕宽度的55%
-    y = int(screenheight * 0.60)  # 设置窗口左上角的Y坐标为屏幕高度的60%
+    x = int(screenwidth * x_rate)  # 设置窗口左上角的X坐标为屏幕宽度的55%
+    y = int(screenheight * y_rate)  # 设置窗口左上角的Y坐标为屏幕高度的60%
     root.geometry(f"+{x}+{y}")
 
     def on_drag(event):
@@ -163,4 +180,5 @@ def draw_overlay():
     root.mainloop()
 
 
-# draw_overlay()
+if DEBUG:
+    draw_overlay()
