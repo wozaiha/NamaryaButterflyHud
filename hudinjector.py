@@ -1864,6 +1864,8 @@ if ui_type == 1:
     from butterflyimg import draw_overlay as the_draw_overlay
 elif ui_type == 2:
     from butterflydraw import draw_overlay as the_draw_overlay
+elif ui_type == 3:
+    from butterflygif import draw_overlay as the_draw_overlay
 else:
     from flowerdraw import draw_overlay as the_draw_overlay
 
