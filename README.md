@@ -14,7 +14,7 @@ ver2
 
 ver3
 
-<img title="" src="./img/previewdraw1.png" alt="previewimg3.png" width="350" data-align="inline">
+<img title="" src="./img/previewimg3.png" alt="previewimg3.png" width="350" data-align="inline">
 
 ## How to run
 
