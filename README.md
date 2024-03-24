@@ -12,6 +12,10 @@ ver2
 
 <img title="" src="./img/previewdraw1.png" alt="previewimg1.png" width="350" data-align="inline">
 
+ver3
+
+<img title="" src="./img/previewimg3.png" alt="previewimg3.png" width="350" data-align="inline">
+
 ## How to run
 
 1.Install python-3.11.6 https://www.python.org/ftp/python/3.11.6/python-3.11.6-amd64.exe
@@ -62,7 +66,7 @@ ver2
 
 1.打开 `config.json`
 
-2.修改'type'对应数值为 1/2/3 以启用不同 ui
+2.修改'type'对应数值为 1/2/3/4 以启用不同 ui
 
 3.修改'size'及'radius'数值以更改 ui 尺寸比例
 

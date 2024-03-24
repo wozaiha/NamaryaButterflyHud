@@ -59,7 +59,6 @@ class ButterflyGif(QWidget):
         try:
             # 非阻塞地从队列中获取数据
             data = data_queue.get_nowait()
-            print(data)
             if self.last_data != data:
                 self.last_data = data
                 # 使用队列中的数据更新GUI
