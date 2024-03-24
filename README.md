@@ -12,6 +12,10 @@ ver2
 
 <img title="" src="./img/previewdraw1.png" alt="previewimg1.png" width="350" data-align="inline">
 
+ver3
+
+<img title="" src="./img/previewdraw1.png" alt="previewimg3.png" width="350" data-align="inline">
+
 ## How to run
 
 1.Install python-3.11.6 https://www.python.org/ftp/python/3.11.6/python-3.11.6-amd64.exe
