@@ -1892,8 +1892,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
-    from packagecheck import package_check
-    package_check()
+    # from packagecheck import package_check
+    # package_check()
 
     main('granblue_fantasy_relink.exe')
     # try:
