@@ -31,3 +31,7 @@ def package_check():
                 print(f"无法安装 {package}，请手动安装。")
                 print(f"failed to install {package}, please install it manually")
                 continue
+
+
+package_check()
+
