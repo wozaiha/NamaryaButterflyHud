@@ -10,7 +10,6 @@ for /f "delims=" %%i in ('where python') do (
         echo !output! | findstr /C:"3.11" >nul && echo !output! | findstr /C:"64 bit" >nul
         if !errorlevel! equ 0 (
             echo Found Python 3.11 64-bit at %%i
-            "%%i" "packagecheck.py"
             "%%i" "hudinjector.py"
             echo script ended with exit code !errorlevel!
             goto :end
