@@ -19,7 +19,6 @@ import types
 
 import time
 
-
 import sys
 import typing
 
@@ -1855,23 +1854,23 @@ class TestHUD(HUD):
 from dataqueue import data_queue
 
 
-f = open(os.path.split(os.path.realpath(__file__))[0] + '\\config.json', 'r')
-res = json.loads(f.read())
-f.close()
-
-ui_type = res["type"]
-if ui_type == 1:
-    from butterflyimg import draw_overlay as the_draw_overlay
-elif ui_type == 2:
-    from butterflydraw import draw_overlay as the_draw_overlay
-elif ui_type == 3:
-    from butterflygif import draw_overlay as the_draw_overlay
-else:
-    from flowerdraw import draw_overlay as the_draw_overlay
-
-
 def injected_main():
     print(f'i am in pid={os.getpid()}')
+
+    f = open(os.path.split(os.path.realpath(__file__))[0] + '\\config.json', 'r')
+    res = json.loads(f.read())
+    f.close()
+
+    ui_type = res["type"]
+    if ui_type == 1:
+        from butterflyimg import draw_overlay as the_draw_overlay
+    elif ui_type == 2:
+        from butterflydraw import draw_overlay as the_draw_overlay
+    elif ui_type == 3:
+        from butterflygif import draw_overlay as the_draw_overlay
+    else:
+        from flowerdraw import draw_overlay as the_draw_overlay
+
     TestHUD.reload()
     t = threading.Thread(target=the_draw_overlay, daemon=True)
     t.start()
@@ -1892,8 +1891,8 @@ def main(exe_name):
 
 if __name__ == '__main__':
     # try:
-    # from packagecheck import package_check
-    # package_check()
+    from packagecheck import package_check
+    package_check()
 
     main('granblue_fantasy_relink.exe')
     # try:

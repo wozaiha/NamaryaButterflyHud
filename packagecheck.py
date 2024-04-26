@@ -1,3 +1,5 @@
+import os
+
 import pkg_resources
 import subprocess
 import sys
@@ -15,7 +17,7 @@ def install(package):
 
 def package_check():
     # 读取requirements.txt文件
-    with open('requirements.txt', 'r') as f:
+    with open(os.path.split(os.path.realpath(__file__))[0] + '\\requirements.txt', 'r') as f:
         packages = f.read().splitlines()
 
     # 检查并安装每个库
@@ -33,5 +35,4 @@ def package_check():
                 continue
 
 
-package_check()
-
+# package_check()
