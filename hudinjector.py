@@ -1788,8 +1788,8 @@ class HUD:
     def _on_updateNamarya_evt(self, hook, a1):
         hook.original(a1)
         try:
-            stance = i8_from(a1 + 0xD12C)
-            num = i8_from(a1 + 0xD400)
+            stance = i8_from(a1 + 0xD32C)
+            num = i8_from(a1 + 0xD600)
 
             if (a1 != self.lasta1 and num != 0) or self.lasta1 == 0:
                 self.lasta1 = a1
